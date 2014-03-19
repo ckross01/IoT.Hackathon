@@ -32,6 +32,9 @@
   </PropertyGroup>
   <Import Project="$(NetMfTargetsBaseDir)$(TargetFrameworkVersion)\CSharp.Targets" />
   <ItemGroup>
+    <Compile Include="..\..\Button\Button\ButtonDriver.cs">
+      <Link>ButtonDriver.cs</Link>
+    </Compile>
     <Compile Include="..\..\Joystick\Joystick\JoystickDriver.cs">
       <Link>JoystickDriver.cs</Link>
     </Compile>

@@ -3,22 +3,10 @@ using Microsoft.SPOT;
 using Microsoft.SPOT.Hardware;
 using System.Threading;
 using Math = System.Math;
+using Button;
 
 namespace Joystick
 {
-    // why don't we have normal event handlers?  Did I miss something
-    public delegate void ButtonClickEventHandler(object sender, EventArgs args);
-    // simple state changed args and handler
-    public delegate void ButtonStateChangedEventHandler(object sender, ButtonStateChangeEventArgs args);
-    public class ButtonStateChangeEventArgs
-    {
-        public bool IsPressed { get; internal set; }
-
-        public ButtonStateChangeEventArgs(bool pressed)
-        {
-            IsPressed = pressed;
-        }
-    }
     // axis changed handler, we just wrap both x and y into a single handler
     // most likley there will be slight variances to the other axis as you move.
     public delegate void AxisChangedEventHandler(object sender, AxisChangeEventArgs args);
@@ -39,11 +27,10 @@ namespace Joystick
     {
         private AnalogInput xPort;
         private AnalogInput yPort;
-        private InterruptPort buttonPort;
-        private DateTime buttonDebounce;
+        private ButtonDriver button;
 
         public event ButtonClickEventHandler OnClick;
-        public event ButtonStateChangedEventHandler OnButtonStateChange;
+        public event ButtonStateEventHandler OnButtonStateChange;
         public event AxisChangedEventHandler OnAxisChange;
         private Thread thread;
 
@@ -55,9 +42,9 @@ namespace Joystick
         {
             this.xPort = new AnalogInput(xPort);
             this.yPort = new AnalogInput(yPort);
-            // button needs to be pulled up 
-            this.buttonPort = new InterruptPort(buttonPort, false, Port.ResistorMode.PullUp, Port.InterruptMode.InterruptEdgeBoth);
-            this.buttonPort.OnInterrupt += new NativeEventHandler(buttonPort_OnInterrupt);
+            this.button = new ButtonDriver(buttonPort);
+            this.button.OnButtonStateChanged += new ButtonStateEventHandler(button_OnButtonStateChanged);
+            this.button.OnClick += new ButtonClickEventHandler(button_OnClick);
 
             // Analog ports can't interrupt, so we spin up a thread to handle reading
             // the values and triggering events
@@ -65,20 +52,16 @@ namespace Joystick
             this.thread.Start();
         }
 
-        void buttonPort_OnInterrupt(uint data1, uint data2, DateTime time)
+        void button_OnClick(object sender, EventArgs args)
         {
-            // debounce filter to prevent multiple events
-            if (time.Subtract(buttonDebounce).Ticks > 1500)
-            {
-                buttonDebounce = time;
-                ButtonState = (data2 % 2) == 0;
-                // always trigger a state change if we are attached to
-                if (OnButtonStateChange != null)
-                    OnButtonStateChange(this, new ButtonStateChangeEventArgs(ButtonState));
-                // only trigger a click event after the button was released
-                if (!ButtonState && OnClick != null)
-                    OnClick(this, EventArgs.Empty);
-            }
+            if (OnClick != null)
+                OnClick(this, args);
+        }
+
+        void button_OnButtonStateChanged(object sender, ButtonStateEventArgs args)
+        {
+            if (OnButtonStateChange != null)
+                OnButtonStateChange(this, args);
         }
 
         void Sampler()

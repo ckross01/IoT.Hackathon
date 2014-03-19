@@ -6,6 +6,7 @@ using Microsoft.SPOT;
 using Microsoft.SPOT.Hardware;
 using SecretLabs.NETMF.Hardware;
 using SecretLabs.NETMF.Hardware.Netduino;
+using Button;
 
 namespace Joystick
 {
@@ -17,7 +18,7 @@ namespace Joystick
             var pad = new JoystickDriver(AnalogChannels.ANALOG_PIN_A0, AnalogChannels.ANALOG_PIN_A1, Pins.GPIO_PIN_D0);
             // attach event handlers
             pad.OnClick += new ButtonClickEventHandler(pad_OnClick);
-            pad.OnButtonStateChange += new ButtonStateChangedEventHandler(pad_OnButtonStateChange);
+            pad.OnButtonStateChange += new ButtonStateEventHandler(pad_OnButtonStateChange);
             pad.OnAxisChange += new AxisChangedEventHandler(pad_OnAxisChange);
 
 
@@ -33,7 +34,7 @@ namespace Joystick
             Debug.Print("Y: " + args.Y.ToString());
         }
 
-        static void pad_OnButtonStateChange(object sender, ButtonStateChangeEventArgs args)
+        static void pad_OnButtonStateChange(object sender, ButtonStateEventArgs args)
         {
             Debug.Print("Button State: " + args.IsPressed.ToString());
         }

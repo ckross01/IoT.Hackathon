@@ -21,7 +21,7 @@ namespace JoystickRGBLED
             led = new RGBLED.RGBLEDDriver(PWMChannels.PWM_PIN_D6, PWMChannels.PWM_PIN_D5, PWMChannels.PWM_PIN_D10);
 
             pad.OnAxisChange += new Joystick.AxisChangedEventHandler(pad_OnAxisChange);
-            pad.OnClick += new Joystick.ButtonClickEventHandler(pad_OnClick);
+            pad.OnClick += new Button.ButtonClickEventHandler(pad_OnClick);
             while (true)
             {
                 Thread.Sleep(10);
