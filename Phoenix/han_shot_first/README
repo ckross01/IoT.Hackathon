@@ -1,0 +1,11 @@
+Team Han Shot First:
+
+Netduino 2 project for Neudesic IoT hackathon.
+
+
+Project Outline:
+1. Motion sensor to detect someone coming into a room and alert via twitter.
+2. When someone leaves/enters a room respond with turning on or off a light.
+
+Stretch:
+3. Via twitter respond to turn off the lights.
